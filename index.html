@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Base64 Tool — encode &amp; decode</title>
+<style>
+  :root{
+    --bg:#0d1117; --card:#161b22; --border:#30363d;
+    --text:#e6edf3; --muted:#8b949e; --accent:#58a6ff; --green:#3fb950; --red:#f85149;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{
+    background:var(--bg); color:var(--text);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
+    min-height:100vh; padding:24px 16px 40px;
+  }
+  .wrap{max-width:640px; margin:0 auto;}
+  header{text-align:center; margin-bottom:20px;}
+  header h1{font-size:1.5rem; font-weight:600;}
+  header h1 span{color:var(--accent);}
+  header p{color:var(--muted); font-size:.85rem; margin-top:6px;}
+  .card{background:var(--card); border:1px solid var(--border); border-radius:12px; padding:18px;}
+  label{display:block; font-size:.78rem; font-weight:600; color:var(--muted);
+    text-transform:uppercase; letter-spacing:.5px; margin:0 0 8px;}
+  label:not(:first-child){margin-top:16px;}
+  textarea{
+    width:100%; min-height:110px; background:var(--bg); color:var(--text);
+    border:1px solid var(--border); border-radius:8px; padding:12px;
+    font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+    font-size:.88rem; line-height:1.5; resize:vertical;
+  }
+  textarea:focus{outline:none; border-color:var(--accent);}
+  #out{background:var(--bg);}
+  .row{display:flex; gap:10px; margin-top:14px; flex-wrap:wrap;}
+  .row button{
+    flex:1; min-width:110px; padding:12px; border-radius:10px; cursor:pointer;
+    font-size:.92rem; font-weight:600; border:1px solid var(--border);
+    background:var(--bg); color:var(--text);
+  }
+  .row button:hover{border-color:var(--accent);}
+  #encBtn{background:var(--green); border-color:var(--green); color:#06230c;}
+  #decBtn{background:var(--accent); border-color:var(--accent); color:#06182e;}
+  .toggle{display:flex; align-items:center; gap:9px; margin-top:14px; font-size:.88rem; color:var(--muted); cursor:pointer; user-select:none; flex-wrap:wrap;}
+  .toggle input{width:17px; height:17px; accent-color:var(--accent); cursor:pointer; flex:none;}
+  #msg{min-height:1.4em; margin-top:12px; font-size:.85rem; text-align:center;}
+  #msg.err{color:var(--red);}
+  #msg.ok{color:var(--green);}
+  .hint{text-align:center; color:var(--muted); font-size:.78rem; margin-top:14px;}
+  code{color:var(--accent);}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1><span>⌁</span> Base64 Tool</h1>
+    <p>Encode &amp; decode, UTF-8 safe — even emoji. 🌍</p>
+  </header>
+  <div class="card">
+    <label for="in">Input</label>
+    <textarea id="in" spellcheck="false" placeholder="Type text to encode, or paste base64 to decode…"></textarea>
+    <label for="out">Output</label>
+    <textarea id="out" spellcheck="false" readonly placeholder="Result appears here…"></textarea>
+    <div class="row">
+      <button id="encBtn" type="button">Encode →</button>
+      <button id="decBtn" type="button">← Decode</button>
+      <button id="copyBtn" type="button">Copy</button>
+    </div>
+    <label class="toggle"><input type="checkbox" id="urlSafe"> URL-safe alphabet <span style="font-size:.78rem;">(<code>-_</code> instead of <code>+/</code>, no padding)</span></label>
+    <div id="msg"></div>
+  </div>
+  <p class="hint">Runs entirely in your browser. Invalid base64 is rejected with a clear error.</p>
+</div>
+<script>
+// ==APP-LOGIC-START==
+function b64encode(str, urlSafe){
+  var bytes = new TextEncoder().encode(str);
+  var bin = '';
+  var CHUNK = 0x8000;
+  for(var i=0; i<bytes.length; i+=CHUNK){
+    bin += String.fromCharCode.apply(null, bytes.subarray(i, i+CHUNK));
+  }
+  var out = btoa(bin);
+  if(urlSafe){ out = out.replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,''); }
+  return out;
+}
+function b64decode(input, urlSafe){
+  var s = String(input).replace(/\s/g,'');
+  if(urlSafe){ s = s.replace(/-/g,'+').replace(/_/g,'/'); }
+  if(s.length===0) return '';
+  if(!/^[A-Za-z0-9+/]*={0,2}$/.test(s) || s.length%4!==0){
+    throw new Error('Invalid Base64: bad characters or bad length.');
+  }
+  var bin;
+  try{ bin = atob(s); }
+  catch(e){ throw new Error('Invalid Base64: could not decode.'); }
+  var bytes = new Uint8Array(bin.length);
+  for(var i=0;i<bin.length;i++){ bytes[i]=bin.charCodeAt(i); }
+  try{ return new TextDecoder('utf-8',{fatal:true}).decode(bytes); }
+  catch(e){ throw new Error('Invalid Base64: not valid UTF-8.'); }
+}
+// ==APP-LOGIC-END==
+if(typeof document!=='undefined'){
+  var inEl=document.getElementById('in');
+  var outEl=document.getElementById('out');
+  var urlSafeEl=document.getElementById('urlSafe');
+  var msgEl=document.getElementById('msg');
+  function setMsg(t, cls){ msgEl.textContent=t; msgEl.className=cls||''; }
+  document.getElementById('encBtn').addEventListener('click',function(){
+    try{ outEl.value=b64encode(inEl.value, urlSafeEl.checked); setMsg('Encoded.','ok'); }
+    catch(e){ setMsg(e.message,'err'); }
+  });
+  document.getElementById('decBtn').addEventListener('click',function(){
+    try{ outEl.value=b64decode(inEl.value, urlSafeEl.checked); setMsg('Decoded.','ok'); }
+    catch(e){ outEl.value=''; setMsg(e.message,'err'); }
+  });
+  document.getElementById('copyBtn').addEventListener('click',function(){
+    var v=outEl.value;
+    if(!v){ setMsg('Nothing to copy yet.','err'); return; }
+    if(navigator.clipboard&&navigator.clipboard.writeText){
+      navigator.clipboard.writeText(v).then(
+        function(){setMsg('Copied to clipboard.','ok');},
+        function(){setMsg('Copy failed — select the text manually.','err');});
+    }else{
+      outEl.select();
+      try{document.execCommand('copy'); setMsg('Copied to clipboard.','ok');}
+      catch(e){setMsg('Copy failed — select the text manually.','err');}
+    }
+  });
+}
+</script>
+</body>
+</html>
