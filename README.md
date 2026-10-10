@@ -17,3 +17,9 @@ Open `index.html`. Type text and hit **Encode →**, or paste Base64 and hit
   `TextDecoder` in fatal mode, so bad input fails with a clear error instead
   of silent mojibake.
 - 100% client-side, zero network requests.
+
+## Files
+
+- `index.html` — the page layout (the words and boxes you see)
+- `styles.css` — all the colors and styling, with plain-words notes
+- `app.js` — the encode/decode logic, with plain-words notes on every step

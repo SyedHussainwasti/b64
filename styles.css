@@ -1,0 +1,94 @@
+/* the color names used all over the page (dark theme) */
+:root{
+  --bg:#0d1117; --card:#161b22; --border:#30363d;
+  --text:#e6edf3; --muted:#8b949e; --accent:#58a6ff; --green:#3fb950; --red:#f85149;
+}
+
+/* removes the browser's default spacing on everything, so we start clean */
+*{box-sizing:border-box; margin:0; padding:0;}
+
+/* the whole page: dark background, light text, comfy font, some breathing room */
+body{
+  background:var(--bg); color:var(--text);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
+  min-height:100vh; padding:24px 16px 40px;
+}
+
+/* centers the content and stops it getting too wide on big screens */
+.wrap{max-width:640px; margin:0 auto;}
+
+/* the top title area, centered */
+header{text-align:center; margin-bottom:20px;}
+
+/* the big "Base64 Tool" title */
+header h1{font-size:1.5rem; font-weight:600;}
+
+/* the little symbol in the title, blue */
+header h1 span{color:var(--accent);}
+
+/* the small grey line under the title */
+header p{color:var(--muted); font-size:.85rem; margin-top:6px;}
+
+/* the main card holding the text boxes and buttons */
+.card{background:var(--card); border:1px solid var(--border); border-radius:12px; padding:18px;}
+
+/* the small labels above the text boxes ("Input" / "Output") */
+label{display:block; font-size:.78rem; font-weight:600; color:var(--muted);
+  text-transform:uppercase; letter-spacing:.5px; margin:0 0 8px;}
+
+/* every label after the first gets extra space above it */
+label:not(:first-child){margin-top:16px;}
+
+/* the two text boxes (input and output) */
+textarea{
+  width:100%; min-height:110px; background:var(--bg); color:var(--text);
+  border:1px solid var(--border); border-radius:8px; padding:12px;
+  font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  font-size:.88rem; line-height:1.5; resize:vertical;
+}
+
+/* the text box edge turns blue when you're typing in it */
+textarea:focus{outline:none; border-color:var(--accent);}
+
+/* the output box shares the page background */
+#out{background:var(--bg);}
+
+/* the row with the Encode / Decode / Copy buttons */
+.row{display:flex; gap:10px; margin-top:14px; flex-wrap:wrap;}
+
+/* the three buttons: they share the row equally */
+.row button{
+  flex:1; min-width:110px; padding:12px; border-radius:10px; cursor:pointer;
+  font-size:.92rem; font-weight:600; border:1px solid var(--border);
+  background:var(--bg); color:var(--text);
+}
+
+/* buttons get a blue edge when you hover over them */
+.row button:hover{border-color:var(--accent);}
+
+/* the Encode button, green */
+#encBtn{background:var(--green); border-color:var(--green); color:#06230c;}
+
+/* the Decode button, blue */
+#decBtn{background:var(--accent); border-color:var(--accent); color:#06182e;}
+
+/* the URL-safe checkbox row */
+.toggle{display:flex; align-items:center; gap:9px; margin-top:14px; font-size:.88rem; color:var(--muted); cursor:pointer; user-select:none; flex-wrap:wrap;}
+
+/* the checkbox itself, a bit bigger and blue when ticked */
+.toggle input{width:17px; height:17px; accent-color:var(--accent); cursor:pointer; flex:none;}
+
+/* the message line under the buttons (success or error text) */
+#msg{min-height:1.4em; margin-top:12px; font-size:.85rem; text-align:center;}
+
+/* error messages show in red */
+#msg.err{color:var(--red);}
+
+/* success messages show in green */
+#msg.ok{color:var(--green);}
+
+/* the small grey note at the bottom of the page */
+.hint{text-align:center; color:var(--muted); font-size:.78rem; margin-top:14px;}
+
+/* code snippets in the small print, blue */
+code{color:var(--accent);}
